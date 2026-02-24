@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.cinema.common.dto.ApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@WebServlet("/api/protected/bookings/*")
+@WebServlet("/api/bookings/*")
 public class BookingServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private final BookingDao bookingDao = new BookingDaoImpl();

@@ -16,7 +16,7 @@ import com.cinema.common.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 
-@WebFilter(urlPatterns = {"/api/protected/bookings/*", "/api/admin/*"})
+@WebFilter(urlPatterns = {"/api/bookings/*", "/api/admin/*", "/api/users/*" })
 public class JwtFilter implements Filter {
 
     private final ObjectMapper mapper = new ObjectMapper();
@@ -30,7 +30,7 @@ public class JwtFilter implements Filter {
         
         String token = null;
         Cookie[] cookies = request.getCookies();
-
+        
         if (cookies != null) {
             for (Cookie c : cookies) {
                 if ("auth_token".equals(c.getName())) {
