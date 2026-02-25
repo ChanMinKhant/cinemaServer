@@ -19,15 +19,23 @@ public class BookingServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            // Get user ID from the JwtFilter attribute
             String userIdStr = (String) request.getAttribute("userId");
-            System.out.println(userIdStr);           
             int userId = Integer.parseInt(userIdStr);
 
-            List<Booking> myBookings = bookingDao.findByUserId(userId);
-            sendResponse(response, HttpServletResponse.SC_OK, new ApiResponse(true, "Bookings retrieved", myBookings));
+            // 🔥 Use enriched query
+            List<BookingView> bookings = bookingDao.findDetailedByUserId(userId);
+
+            sendResponse(
+                response,
+                HttpServletResponse.SC_OK,
+                new ApiResponse(true, "Bookings retrieved", bookings)
+            );
         } catch (Exception e) {
-            sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, new ApiResponse(false, e.getMessage()));
+            sendResponse(
+                response,
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                new ApiResponse(false, e.getMessage())
+            );
         }
     }
 

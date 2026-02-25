@@ -101,4 +101,63 @@ public class BookingDaoImpl implements BookingDao {
         }
         return seatIds;
     }
+    
+    @Override
+    public List<BookingView> findDetailedByUserId(int userId) {
+        List<BookingView> list = new ArrayList<>();
+
+        String sql =
+        	    "SELECT " +
+        	    " b.id AS booking_id, " +
+        	    " b.total_price, " +
+        	    " b.booked_at, " +
+
+        	    " u.username, " +
+        	    " m.title AS movie_title, " +
+        	    " st.room, " +
+        	    " st.show_date, " +
+        	    " st.show_time, " +
+
+        	    " GROUP_CONCAT(CONCAT(s.seat_row, s.seat_number) ORDER BY s.seat_row, s.seat_number) AS seats " +
+
+        	    "FROM bookings b " +
+        	    "JOIN users u ON b.user_id = u.id " +
+        	    "JOIN showtimes st ON b.showtime_id = st.id " +
+        	    "JOIN movies m ON st.movie_id = m.id " +
+        	    "JOIN booking_seats bs ON bs.booking_id = b.id " +
+        	    "JOIN seats s ON bs.seat_id = s.id " +
+
+        	    "WHERE b.user_id = ? " +
+        	    "GROUP BY b.id " +
+        	    "ORDER BY b.booked_at DESC";
+
+        try (Connection c = DBUtil.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                BookingView v = new BookingView();
+                v.setId(rs.getInt("booking_id"));
+                v.setTotalPrice(rs.getInt("total_price"));
+                v.setBookedAt(rs.getTimestamp("booked_at").getTime());
+
+                v.setUsername(rs.getString("username"));
+                v.setMovieTitle(rs.getString("movie_title"));
+                v.setRoom(rs.getString("room"));
+                v.setShowDate(rs.getString("show_date"));
+                v.setShowTime(rs.getString("show_time"));
+
+                String seats = rs.getString("seats");
+                v.setSeats(seats != null ? List.of(seats.split(",")) : List.of());
+
+                list.add(v);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to fetch detailed bookings", e);
+        }
+
+        return list;
+    }
 }
