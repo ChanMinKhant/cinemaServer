@@ -16,7 +16,7 @@ import com.cinema.common.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 
-@WebFilter(urlPatterns = {"/api/bookings/*", "/api/admin/*", "/api/users/*" })
+@WebFilter(urlPatterns = {"/api/bookings/*", "/api/admin/*", "/api/users/*", "/api/deposits/*", "/api/admin/deposits/*" })
 public class JwtFilter implements Filter {
 
     private final ObjectMapper mapper = new ObjectMapper();
@@ -51,7 +51,7 @@ public class JwtFilter implements Filter {
                 request.setAttribute("userRole", role);
 
                 // Print to console as requested
-                System.out.println("[Middleware] User ID " + userId + " accessed " + request.getRequestURI());
+                System.out.println("[Middleware] User ID " + role + " accessed " + request.getRequestURI());
 
                 chain.doFilter(request, response);
             } catch (Exception e) {

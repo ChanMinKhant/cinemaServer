@@ -19,11 +19,19 @@ public class BookingServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
+            // Retrieve userId and role from request attributes (set by JwtFilter)
             String userIdStr = (String) request.getAttribute("userId");
+            String role = (String) request.getAttribute("role"); 
+            
             int userId = Integer.parseInt(userIdStr);
+            List<BookingView> bookings;
 
-            // 🔥 Use enriched query
-            List<BookingView> bookings = bookingDao.findDetailedByUserId(userId);
+            // Logic: Admin gets everything, User gets only their own
+            if ("ADMIN".equalsIgnoreCase(role)) {
+                bookings = bookingDao.findAllDetailed();
+            } else {
+                bookings = bookingDao.findDetailedByUserId(userId);
+            }
 
             sendResponse(
                 response,
