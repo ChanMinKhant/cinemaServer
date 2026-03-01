@@ -21,6 +21,14 @@ public class AuthServiceImpl implements AuthService {
         if (userDao.findByUsername(dto.username) != null) {
             throw new RuntimeException("Username already taken");
         }
+        
+        if (userDao.findByEmail(dto.email) != null) {
+        	 throw new RuntimeException("Email already taken");
+        }
+        
+        if (userDao.findByPhone(dto.phone) != null) {
+       	 throw new RuntimeException("Email already taken");
+       }
 
         User u = new User();
         u.username = dto.username;

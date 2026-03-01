@@ -1,5 +1,6 @@
 package com.cinema.showtime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.sql.Date;
 import java.sql.Time;
 
@@ -9,6 +10,8 @@ public class Showtime {
     private String room;
     private Date showDate;
     private Time showTime;
+    @JsonIgnore 
+    private boolean active = true;
 
     public Showtime() {}
 
@@ -31,4 +34,6 @@ public class Showtime {
     public void setShowDate(Date showDate) { this.showDate = showDate; }
     public Time getShowTime() { return showTime; }
     public void setShowTime(Time showTime) { this.showTime = showTime; }
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
 }

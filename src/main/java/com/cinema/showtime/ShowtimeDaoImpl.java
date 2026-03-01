@@ -10,7 +10,8 @@ public class ShowtimeDaoImpl implements ShowtimeDao {
     @Override
     public List<Showtime> findAll() {
         List<Showtime> list = new ArrayList<>();
-        String sql = "SELECT * FROM showtimes";
+        // Added WHERE is_active = TRUE
+        String sql = "SELECT * FROM showtimes WHERE isActive = TRUE"; 
         try (Connection c = DBUtil.getConnection();
              Statement st = c.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
@@ -62,13 +63,14 @@ public class ShowtimeDaoImpl implements ShowtimeDao {
 
     @Override
     public void delete(int id) {
-        String sql = "DELETE FROM showtimes WHERE id = ?";
+        // Changed from DELETE to UPDATE
+        String sql = "UPDATE showtimes SET isActive = FALSE WHERE id = ?";
         try (Connection c = DBUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Error deleting showtime", e);
+            throw new RuntimeException("Error deactivating showtime", e);
         }
     }
 }

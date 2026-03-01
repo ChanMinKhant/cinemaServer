@@ -1,3 +1,4 @@
 eclipse.preferences.version=1
 encoding//src/main/java/com/cinema/booking/BookingDao.java=UTF-8
 encoding//src/main/java/com/cinema/booking/BookingServlet.java=UTF-8
+encoding//src/main/java/com/cinema/common/filter/RouterFilter.java=UTF-8

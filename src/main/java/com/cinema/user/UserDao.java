@@ -10,4 +10,6 @@ public interface UserDao {
     void update(User user);
     void delete(Integer id);
     void updateBalance(int userId, int newBalance);
+	User findByEmail(String email);
+	User findByPhone(String phone);
 }
