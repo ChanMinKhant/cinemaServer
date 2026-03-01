@@ -74,6 +74,8 @@ public class UserServlet extends HttpServlet {
         setupResponse(response);
         try {
             User u = mapper.readValue(request.getReader(), User.class);
+            u.balance = 0;
+            u.role = "user";
             userDao.save(u);
             response.setStatus(201);
             sendResponse(response, new ApiResponse(true, "User created", null));
@@ -90,9 +92,12 @@ public class UserServlet extends HttpServlet {
             if (pathInfo != null && !pathInfo.equals("/")) {
                 Integer id = Integer.parseInt(pathInfo.substring(1));
                 User u = mapper.readValue(request.getReader(), User.class);
-                u.id = id;
-                userDao.update(u);
-                sendResponse(response, new ApiResponse(true, "User updated", null));
+                
+                // If the password is null in the request, we should NOT use the standard update(u)
+                // Instead, we use our new specific balance update
+                userDao.updateBalance(id, u.balance); 
+                
+                sendResponse(response, new ApiResponse(true, "Balance updated successfully", null));
             } else {
                 response.setStatus(400);
                 sendResponse(response, new ApiResponse(false, "ID required", null));

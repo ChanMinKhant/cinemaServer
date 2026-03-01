@@ -9,4 +9,5 @@ public interface UserDao {
     void save(User user);
     void update(User user);
     void delete(Integer id);
+    void updateBalance(int userId, int newBalance);
 }

@@ -17,7 +17,7 @@ public class DepositApprovalServlet extends HttpServlet {
         try {
             // Verify admin role (assuming this is set upstream by an Auth Filter)
         	
-            String role = (String) request.getAttribute("role");
+            String role = (String) request.getAttribute("userRole");
             System.out.println(role);
             if (!"admin".equals(role)) {
                 sendResponse(response, 403, new ApiResponse(false, "Unauthorized: Admin privileges required"));

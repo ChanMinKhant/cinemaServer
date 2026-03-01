@@ -37,6 +37,8 @@ public class AuthServlet extends HttpServlet {
                 handleLogin(request, response);
             } else if ("/register".equals(pathInfo)) {
                 handleRegister(request, response);
+            } else if ("/logout".equals(pathInfo)) { // ADD THIS
+                handleLogout(response);
             } else {
                 sendResponse(response, HttpServletResponse.SC_NOT_FOUND, new ApiResponse(false, "Endpoint not found"));
             }
@@ -69,5 +71,16 @@ public class AuthServlet extends HttpServlet {
     private void sendResponse(HttpServletResponse response, int status, ApiResponse apiResponse) throws IOException {
         response.setStatus(status);
         response.getWriter().write(mapper.writeValueAsString(apiResponse));
+    }
+    
+    private void handleLogout(HttpServletResponse response) throws IOException {
+        // To logout, we send a cookie with the same name but set its age to 0
+        Cookie jwtCookie = new Cookie("auth_token", "");
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(0); // This tells the browser to delete the cookie immediately
+        response.addCookie(jwtCookie);
+
+        sendResponse(response, HttpServletResponse.SC_OK, new ApiResponse(true, "Logout successful"));
     }
 }

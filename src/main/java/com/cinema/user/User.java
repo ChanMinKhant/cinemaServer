@@ -1,7 +1,6 @@
 package com.cinema.user;
 
 import java.sql.Timestamp;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class User {

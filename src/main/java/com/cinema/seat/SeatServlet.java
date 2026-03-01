@@ -20,14 +20,28 @@ public class SeatServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             String pathInfo = request.getPathInfo();
-            
-            // Handle /api/seats/booked?showtimeId=...
+            String userIdStr = (String) request.getAttribute("userId");
+            int userId = userIdStr != null ? Integer.parseInt(userIdStr) : 0;
+
+            // 1. Handle /api/seats/booked?showtimeId=...
             if (pathInfo != null && pathInfo.equals("/booked")) {
                 String showtimeIdStr = request.getParameter("showtimeId");
                 if (showtimeIdStr != null && !showtimeIdStr.isBlank()) {
                     int showtimeId = Integer.parseInt(showtimeIdStr);
                     List<Integer> bookedSeatIds = seatDao.findBookedSeatIdsByShowtime(showtimeId);
                     sendResponse(response, HttpServletResponse.SC_OK, new ApiResponse(true, "Booked seats retrieved", bookedSeatIds));
+                    return;
+                }
+            }
+
+            // 2. Handle /api/seats/my-booking?showtimeId=...
+            if (pathInfo != null && pathInfo.equals("/my-booking")) {
+                String showtimeIdStr = request.getParameter("showtimeId");
+                if (showtimeIdStr != null && !showtimeIdStr.isBlank()) {
+                    int showtimeId = Integer.parseInt(showtimeIdStr);
+                    // Make sure to implement this method in your DAO!
+                    List<Integer> myBookedSeatIds = seatDao.findMyBookedSeatIdsByShowtime(showtimeId, userId);
+                    sendResponse(response, HttpServletResponse.SC_OK, new ApiResponse(true, "My booked seats retrieved", myBookedSeatIds));
                     return;
                 }
             }

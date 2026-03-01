@@ -44,7 +44,6 @@ public class SeatDaoImpl implements SeatDao {
     @Override
     public List<Integer> findBookedSeatIdsByShowtime(int showtimeId) {
         List<Integer> bookedIds = new ArrayList<>();
-        // Querying the join table to find seats already assigned to this showtime
         String sql = "SELECT seat_id FROM booking_seats WHERE showtime_id = ?";
         try (Connection c = DBUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -58,6 +57,32 @@ public class SeatDaoImpl implements SeatDao {
             throw new RuntimeException("Error fetching booked seats", e);
         }
         return bookedIds;
+    }
+
+    @Override
+    public List<Integer> findMyBookedSeatIdsByShowtime(int showtimeId, int userId) {
+        List<Integer> myBookedSeatIds = new ArrayList<>();
+        // Updated to use 'booking_seats' joined with 'bookings' to filter by user
+        String sql = "SELECT bs.seat_id " +
+                     "FROM booking_seats bs " +
+                     "JOIN bookings b ON bs.booking_id = b.id " +
+                     "WHERE bs.showtime_id = ? AND b.user_id = ?";
+
+        try (Connection c = DBUtil.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            
+            ps.setInt(1, showtimeId);
+            ps.setInt(2, userId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    myBookedSeatIds.add(rs.getInt("seat_id"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching user's booked seats", e);
+        }
+        return myBookedSeatIds;
     }
 
     @Override

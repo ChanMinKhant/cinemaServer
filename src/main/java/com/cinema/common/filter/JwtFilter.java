@@ -16,7 +16,7 @@ import com.cinema.common.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 
-@WebFilter(urlPatterns = {"/api/bookings/*", "/api/admin/*", "/api/users/*", "/api/deposits/*", "/api/admin/deposits/*" })
+@WebFilter(urlPatterns = {"/api/bookings/*", "/api/admin/*", "/api/seats/*", "/api/users/*", "/api/deposits/*", "/api/admin/deposits/*" })
 public class JwtFilter implements Filter {
 
     private final ObjectMapper mapper = new ObjectMapper();

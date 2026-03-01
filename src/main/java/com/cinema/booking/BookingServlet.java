@@ -8,60 +8,80 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.cinema.common.dto.ApiResponse;
+import com.cinema.user.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebServlet("/api/bookings/*")
 public class BookingServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
     private final BookingDao bookingDao = new BookingDaoImpl();
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            // Retrieve userId and role from request attributes (set by JwtFilter)
+            String pathInfo = request.getPathInfo();
+            String role = (String) request.getAttribute("userRole");
             String userIdStr = (String) request.getAttribute("userId");
-            String role = (String) request.getAttribute("role"); 
-            
-            int userId = Integer.parseInt(userIdStr);
-            List<BookingView> bookings;
 
-            // Logic: Admin gets everything, User gets only their own
-            if ("ADMIN".equalsIgnoreCase(role)) {
-                bookings = bookingDao.findAllDetailed();
-            } else {
-                bookings = bookingDao.findDetailedByUserId(userId);
+            // Handle Admin User Lookup for a specific seat
+            if (pathInfo != null && pathInfo.equals("/seat-user")) {
+                if (!"admin".equalsIgnoreCase(role)) {
+                    sendResponse(response, 403, new ApiResponse(false, "Admin access required"));
+                    return;
+                }
+
+                String showtimeIdParam = request.getParameter("showtimeId");
+                String seatIdParam = request.getParameter("seatId");
+
+                if (showtimeIdParam == null || seatIdParam == null) {
+                    sendResponse(response, 400, new ApiResponse(false, "Missing showtimeId or seatId"));
+                    return;
+                }
+
+                User user = bookingDao.findUserBySeatAndShowtime(
+                    Integer.parseInt(showtimeIdParam), 
+                    Integer.parseInt(seatIdParam)
+                );
+
+                if (user != null) {
+                    sendResponse(response, 200, new ApiResponse(true, "User found", user));
+                } else {
+                    sendResponse(response, 404, new ApiResponse(false, "No booking found for this seat"));
+                }
+                return;
             }
 
-            sendResponse(
-                response,
-                HttpServletResponse.SC_OK,
-                new ApiResponse(true, "Bookings retrieved", bookings)
-            );
+            // Standard Booking Retrieval
+            if (userIdStr == null) {
+                sendResponse(response, 401, new ApiResponse(false, "Unauthorized"));
+                return;
+            }
+
+            int userId = Integer.parseInt(userIdStr);
+            List<BookingView> result;
+
+            if ("admin".equalsIgnoreCase(role)) {
+                result = bookingDao.findAllDetailed();
+            } else {
+                result = bookingDao.findDetailedByUserId(userId);
+            }
+            sendResponse(response, 200, new ApiResponse(true, "Success", result));
+
         } catch (Exception e) {
-            sendResponse(
-                response,
-                HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                new ApiResponse(false, e.getMessage())
-            );
+            sendResponse(response, 500, new ApiResponse(false, e.getMessage()));
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            // Get user ID from the JwtFilter attribute to ensure the booking is for the current user
             String userIdStr = (String) request.getAttribute("userId");
-            int userId = Integer.parseInt(userIdStr);
-
             Booking booking = mapper.readValue(request.getInputStream(), Booking.class);
-            booking.setUserId(userId); // Override with authenticated ID for security
-
+            booking.setUserId(Integer.parseInt(userIdStr));
             bookingDao.createBooking(booking);
-            sendResponse(response, HttpServletResponse.SC_CREATED, new ApiResponse(true, "Booking confirmed successfully"));
+            sendResponse(response, 201, new ApiResponse(true, "Booking successful"));
         } catch (Exception e) {
-            // Return specific error message (e.g., "Seats already booked")
-            sendResponse(response, HttpServletResponse.SC_BAD_REQUEST, new ApiResponse(false, e.getMessage()));
+            sendResponse(response, 400, new ApiResponse(false, e.getMessage()));
         }
     }
 

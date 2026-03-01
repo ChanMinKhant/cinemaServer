@@ -10,4 +10,5 @@ public interface SeatDao {
     void save(Seat seat);
     void update(Seat seat);
     void delete(int id);
+    public List<Integer> findMyBookedSeatIdsByShowtime(int showtimeId, int userId);
 }

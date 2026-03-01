@@ -112,4 +112,16 @@ public class UserDaoImpl implements UserDao {
         u.createdAt = rs.getTimestamp("created_at");
         return u;
     }
+    @Override
+    public void updateBalance(int userId, int newBalance) {
+        String sql = "UPDATE users SET balance = ? WHERE id = ?";
+        try (Connection c = DBUtil.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, newBalance);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update balance", e);
+        }
+    }
 }
