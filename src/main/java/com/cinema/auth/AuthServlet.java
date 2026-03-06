@@ -63,8 +63,13 @@ public class AuthServlet extends HttpServlet {
 
     private void handleRegister(HttpServletRequest request, HttpServletResponse response) throws IOException {
         RegisterRequestDTO dto = mapper.readValue(request.getInputStream(), RegisterRequestDTO.class);
-        authService.register(dto);
-        
+        String token = authService.register(dto);
+     // JWT in HttpOnly Cookie
+        Cookie jwtCookie = new Cookie("auth_token", token);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(24 * 60 * 60); 
+        response.addCookie(jwtCookie);
         sendResponse(response, HttpServletResponse.SC_CREATED, new ApiResponse(true, "Registration successful"));
     }
 

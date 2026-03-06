@@ -4,7 +4,7 @@ public final class DBConfig {
 
     public static final String HOST = "localhost";
     public static final String PORT = "3306";
-    public static final String DB_NAME = "cinema1";
+    public static final String DB_NAME = "cinema_db";
 
     public static final String USERNAME = "root";
     public static final String PASSWORD = "";

@@ -14,7 +14,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserDao userDao = new UserDaoImpl();
 
     @Override
-    public void register(RegisterRequestDTO dto) {
+    public String register(RegisterRequestDTO dto) {
         // Validation logic
         validateRegistration(dto);
 
@@ -38,6 +38,7 @@ public class AuthServiceImpl implements AuthService {
         u.role = "user"; // Default role
 
         userDao.save(u);
+        return JwtUtil.generateToken(u.id, u.role);
     }
 
     @Override

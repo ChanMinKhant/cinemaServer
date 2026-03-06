@@ -17,7 +17,7 @@ public class DepositServlet extends HttpServlet {
         try {
             // 1. Get User Info from JwtFilter attributes
             String userIdStr = (String) request.getAttribute("userId");
-            String role = (String) request.getAttribute("role");
+            String role = (String) request.getAttribute("userRole");
             int userId = Integer.parseInt(userIdStr);
 
             List<Deposit> deposits;

@@ -5,6 +5,6 @@ import com.cinema.common.dto.LoginRequestDTO;
 import com.cinema.common.dto.RegisterRequestDTO;
 
 public interface AuthService {
-    void register(RegisterRequestDTO dto);
+    String register(RegisterRequestDTO dto);
     String login(LoginRequestDTO dto);
 }
